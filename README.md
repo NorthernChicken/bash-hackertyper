@@ -15,5 +15,5 @@ You type random gibberish, out comes professional looking code, making you look 
 
 To change the text that is outputed:
 1. Go to the directory you downloaded
-2. ```nano code_to_typer.txt```
+2. ```nano code_to_type.txt```
 3. Change, replace, or add onto the existing sample code!
