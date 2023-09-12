@@ -1,0 +1,12 @@
+#!/bin/bash
+
+while [ 1 = 1 ]
+do
+    # Read input with timeout
+    read -t 1 -n 1 key
+
+    # Check if a key was pressed
+    if [ "$?" = 0 ]; then
+        echo "TEST_OUTPUT"
+    fi
+done
