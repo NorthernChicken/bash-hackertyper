@@ -1,4 +1,4 @@
 # bash-hackertyper
 *Currently under development*
 
-Generates random bash outputs when typing randomly into a terminal, making you look like a hacker. Inspired by https://hackertyper.net/ 
+You type random gibberish, out comes professional looiking code, making you look like a hacker. Inspired by https://hackertyper.net/ 
