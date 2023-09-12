@@ -1,6 +1,6 @@
 # bash-hackertyper
 
-You type random gibberish, out comes professional looking code, making you look like a hacker. Inspired by https://hackertyper.net/ 
+You type random gibberish, out comes professional-looking code. Look like a hacker, impress your friends. Inspired by https://hackertyper.net/ 
 
 # Install and Run
 
