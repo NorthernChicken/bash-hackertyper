@@ -5,7 +5,7 @@ You type random gibberish, out comes professional looking code, making you look 
 
 # Install and Run
 
-1. Go to releases
+1. Go to [releases](https://github.com/NorthernChicken/bash-hackertyper/releases)
 2. Download "bash-hackertyper_v1.0.zip"
 3. Extract the zip: ```unzip bash-hackertyper_v1.0.zip```
 5. ```cd bash-hackertyper_v1.0 ```
