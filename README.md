@@ -10,3 +10,10 @@ You type random gibberish, out comes professional looking code, making you look 
 5. ```cd bash-hackertyper_v1.0 ```
 6. ```chmod +x bash-hackertyper.sh```
 7. ```./bash-hackertyper.sh ```
+
+# Customization
+
+To change the text that is outputed:
+1. Go to the directory you downloaded
+2. ```nano code_to_typer.txt```
+3. Change, replace, or add onto the existing sample code!
