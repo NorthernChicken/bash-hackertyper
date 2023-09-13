@@ -26,9 +26,9 @@ do
 
     # Check if a key was pressed
     if [ "$?" = 0 ]; then
-        # Print the next character from the predetermined text
+        # Print the next 3 characters from the predetermined text
         echo -n "${text_to_type:$index:1}"
-        index=$(( (index + 1) % ${#text_to_type} ))
+        index=$(( (index + 3) % ${#text_to_type} ))
 
     fi
 done
