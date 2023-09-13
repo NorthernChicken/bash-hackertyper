@@ -1,7 +1,5 @@
 #!/bin/bash
 
-tput setaf 2
-
 # Specify the path to the text file containing the code to type
 text_file="code_to_type.txt"
 
@@ -17,9 +15,13 @@ fi
 
 index=0
 
+clear
+
+tput setaf 2
+
 while [ 1 = 1 ]
 do
-    # Read input with timeout
+    # Read keyboard input
     read -s -n 1 key
 
     # Check if a key was pressed
@@ -30,3 +32,4 @@ do
 
     fi
 done
+
