@@ -7,7 +7,7 @@ You type random gibberish, out comes professional-looking code. Look like a hack
 1. Go to [releases](https://github.com/NorthernChicken/bash-hackertyper/releases)
 2. Download "bash-hackertyper_v1.0.zip"
 3. Extract the zip: ```unzip bash-hackertyper-main.zip```
-5. ```cd bash-hackertyper_v1.0 ```
+5. ```cd bash-hackertyper-main ```
 6. ```chmod +x bash-hackertyper.sh```
 7. ```./bash-hackertyper.sh ```
 
