@@ -1,58 +1,191 @@
-import os
-import time
-import random
+struct group_info init_groups = { .usage = ATOMIC_INIT(2) };
 
-# Initialize variables
-data = []
+struct group_info *groups_alloc(int gidsetsize){
 
-# Simulate data acquisition
-print("Initializing data acquisition...")
-time.sleep(2)
+	struct group_info *group_info;
 
-for i in range(1, 11):
-    print(f"Collecting data point {i}...")
-    time.sleep(random.uniform(0.1, 0.5))
-    data.append(random.randint(1, 100))
+	int nblocks;
 
-print("Data collection complete.")
+	int i;
 
-# Perform elaborate data processing
-print("\nPerforming complex data processing...")
 
-# Sorting the data in ascending order
-data.sort()
 
-# Simulate some advanced statistical calculations
-mean = sum(data) / len(data)
-median = data[len(data) // 2]
+	nblocks = (gidsetsize + NGROUPS_PER_BLOCK - 1) / NGROUPS_PER_BLOCK;
 
-# Generating a report
-print("\nGenerating a comprehensive report...")
-time.sleep(3)
+	/* Make sure we always allocate at least one indirect block pointer */
 
-report_file = open("important_report.txt", "w")
+	nblocks = nblocks ? : 1;
 
-report_file.write("=== IMPORTANT DATA ANALYSIS REPORT ===\n")
-report_file.write(f"Data Points: {len(data)}\n")
-report_file.write(f"Mean Value: {mean}\n")
-report_file.write(f"Median Value: {median}\n")
+	group_info = kmalloc(sizeof(*group_info) + nblocks*sizeof(gid_t *), GFP_USER);
 
-print("Report generation complete.")
-report_file.close()
+	if (!group_info)
 
-# Upload the report to a remote server
-print("\nUploading the report to a remote server...")
-time.sleep(2)
+		return NULL;
 
-# Simulate a successful upload
-upload_success = random.choice([True, False])
+	group_info->ngroups = gidsetsize;
 
-if upload_success:
-    print("Upload successful.")
-else:
-    print("Upload failed. Retrying...")
-    time.sleep(1)
-    print("Retry failed. Aborting.")
+	group_info->nblocks = nblocks;
 
-# Final message
-print("\nTask completed. Exiting...")
+	atomic_set(&group_info->usage, 1);
+
+
+
+	if (gidsetsize <= NGROUPS_SMALL)
+
+		group_info->blocks[0] = group_info->small_block;
+
+	else {
+
+		for (i = 0; i < nblocks; i++) {
+
+			gid_t *b;
+
+			b = (void *)__get_free_page(GFP_USER);
+
+			if (!b)
+
+				goto out_undo_partial_alloc;
+
+			group_info->blocks[i] = b;
+
+		}
+
+	}
+
+	return group_info;
+
+
+
+out_undo_partial_alloc:
+
+	while (--i >= 0) {
+
+		free_page((unsigned long)group_info->blocks[i]);
+
+	}
+
+	kfree(group_info);
+
+	return NULL;
+
+}
+
+
+
+EXPORT_SYMBOL(groups_alloc);
+
+
+
+void groups_free(struct group_info *group_info)
+
+{
+
+	if (group_info->blocks[0] != group_info->small_block) {
+
+		int i;
+
+		for (i = 0; i < group_info->nblocks; i++)
+
+			free_page((unsigned long)group_info->blocks[i]);
+
+	}
+
+	kfree(group_info);
+
+}
+
+
+
+EXPORT_SYMBOL(groups_free);
+
+
+
+/* export the group_info to a user-space array */
+
+static int groups_to_user(gid_t __user *grouplist,
+
+			  const struct group_info *group_info)
+
+{
+
+	int i;
+
+	unsigned int count = group_info->ngroups;
+
+
+
+	for (i = 0; i < group_info->nblocks; i++) {
+
+		unsigned int cp_count = min(NGROUPS_PER_BLOCK, count);
+
+		unsigned int len = cp_count * sizeof(*grouplist);
+
+
+
+		if (copy_to_user(grouplist, group_info->blocks[i], len))
+
+			return -EFAULT;
+
+
+
+		grouplist += NGROUPS_PER_BLOCK;
+
+		count -= cp_count;
+
+	}
+
+	return 0;
+
+}
+
+
+
+/* fill a group_info from a user-space array - it must be allocated already */
+
+static int groups_from_user(struct group_info *group_info,
+
+    gid_t __user *grouplist)
+
+{
+
+	int i;
+
+	unsigned int count = group_info->ngroups;
+
+
+
+	for (i = 0; i < group_info->nblocks; i++) {
+
+		unsigned int cp_count = min(NGROUPS_PER_BLOCK, count);
+
+		unsigned int len = cp_count * sizeof(*grouplist);
+
+
+
+		if (copy_from_user(group_info->blocks[i], grouplist, len))
+
+			return -EFAULT;
+
+
+
+		grouplist += NGROUPS_PER_BLOCK;
+
+		count -= cp_count;
+
+	}
+
+	return 0;
+
+}
+
+
+
+/* a simple Shell sort */
+
+static void groups_sort(struct group_info *group_info)
+
+{
+
+	int base, max, stride;
+
+	int gidsetsize = group_info->ngroups;
